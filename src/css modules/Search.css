@@ -1,0 +1,26 @@
+.custom-input {
+    outline: none;
+    border: 1px solid gray;
+    width: 15px;
+    height: 25px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 5px;
+    text-align: center;
+    color: #1ecbe1;
+    font-size: 16px;
+}
+
+.custom-input:focus {
+    border-color: #1ecbe1;
+}
+
+a:visited {
+    text-decoration: none;
+    color: #1ecbe1;
+}
+
+a {
+    text-decoration: none;
+    color: #1ecbe1;
+}
