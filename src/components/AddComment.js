@@ -1,5 +1,5 @@
 
-import { Alert, Button, Card, CardActions, CardContent, Snackbar, TextField } from '@mui/material'
+import { Alert, Button, Card, CardActions, CardContent, Snackbar, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useAuthContext } from '../hooks/useAuthContext'
 import axios from 'axios'
@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom'
 
 function AddComment({ addingComment, setAddingComment }) {
     const [name, setName] = useState('')
-    
+
     const { user } = useAuthContext()
 
     const params = useParams()
@@ -27,6 +27,34 @@ function AddComment({ addingComment, setAddingComment }) {
             setName('')
         }
     }, [user])
+
+    const [fileDetails, setFileDetails] = useState(null)
+    const [errorMsg, setErrorMsg] = useState('Loading Details...')
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/files/getpdfinvitedetails/${fileId}`, {
+                    params: {
+                        inviteId
+                    }
+                });
+                setFileDetails(response.data)
+
+            } catch (error) {
+                console.error(error);
+                if (error.response.status === 401) {
+                    setErrorMsg("You don't have access to the file")
+                }
+                if (error.response.data.error.kind === 'ObjectId') {
+                    setErrorMsg("There is something wrong with the file id")
+                }
+                if (error.response.status === 400) {
+                    setErrorMsg("There is something went wrong")
+                }
+            }
+        })()
+    }, [inviteId, fileId])
 
     const handleAddComment = async () => {
         if (name === null || name.trim().length <= 0) {
@@ -66,7 +94,6 @@ function AddComment({ addingComment, setAddingComment }) {
             setSeverity('error')
             setSnackOpen(true)
         }
-
     }
 
     return (
@@ -83,70 +110,100 @@ function AddComment({ addingComment, setAddingComment }) {
                     paddingTop: '10px'
                 }}
             >
-                <CardContent>
-                    <TextField
-                        label='Name'
-                        fullWidth
-                        size='small'
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        disabled={user !== null}
-                        sx={{
-                            '& label.Mui-focused': {
-                                color: '#FB04B4',
-                            },
-                            '& .MuiOutlinedInput-root': {
-                                '&.Mui-focused fieldset': {
-                                    borderColor: '#FB04B4',
-                                },
-                            },
-                            marginBottom: '10px'
-                        }}
-                    />
-                    <TextField
-                        label='Comment'
-                        placeholder='Add a Comment'
-                        size='small'
-                        fullWidth
-                        multiline
-                        maxRows={3}
-                        value={comment}
-                        onChange={e => setComment(e.target.value)}
-                        sx={{
-                            '& label.Mui-focused': {
-                                color: '#FB04B4',
-                            },
-                            '& .MuiOutlinedInput-root': {
-                                '&.Mui-focused fieldset': {
-                                    borderColor: '#FB04B4',
-                                },
-                            },
-                            input: { color: '#FB04B4' },
-                            marginBottom: '20px'
-                        }}
-                    />
+                {
+                    fileDetails ?
+                        <>
+                            <CardContent>
+                                <Typography
+                                    sx={{
+                                        marginLeft: '10px',
+                                        marginRight: '10px',
+                                        marginBottom: '15px',
+                                        fontWeight: 'bold',
+                                        color: '#1bb9cd',
+                                    }}                                    
+                                >
+                                    {fileDetails.name}
+                                </Typography>
+                                <TextField
+                                    label='Name'
+                                    fullWidth
+                                    size='small'
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    disabled={user !== null}
+                                    sx={{
+                                        '& label.Mui-focused': {
+                                            color: '#FB04B4',
+                                        },
+                                        '& .MuiOutlinedInput-root': {
+                                            '&.Mui-focused fieldset': {
+                                                borderColor: '#FB04B4',
+                                            },
+                                        },
+                                        marginBottom: '10px'
+                                    }}
+                                />
+                                <TextField
+                                    label='Comment'
+                                    placeholder='Add a Comment'
+                                    size='small'
+                                    fullWidth
+                                    multiline
+                                    maxRows={3}
+                                    value={comment}
+                                    onChange={e => setComment(e.target.value)}
+                                    sx={{
+                                        '& label.Mui-focused': {
+                                            color: '#FB04B4',
+                                        },
+                                        '& .MuiOutlinedInput-root': {
+                                            '&.Mui-focused fieldset': {
+                                                borderColor: '#FB04B4',
+                                            },
+                                        },
+                                        input: { color: '#FB04B4' },
+                                        marginBottom: '20px'
+                                    }}
+                                />
 
-                </CardContent>
-                <CardActions
-                    sx={{
-                        textAlign: 'right',
-                        width: '100%',
-                        position: 'relative'
-                    }}
-                >
-                    <Button
-                        sx={{
-                            position: 'absolute',
-                            bottom: '7px',
-                            right: '35px',
-                            color: '#FB04B4'
-                        }}
-                        onClick={handleAddComment}
-                        disabled={addingComment || comment === null}
-                    >
-                        Add Comment
-                    </Button>
-                </CardActions>
+                            </CardContent>
+                            <CardActions
+                                sx={{
+                                    textAlign: 'right',
+                                    width: '100%',
+                                    position: 'relative'
+                                }}
+                            >
+                                <Button
+                                    sx={{
+                                        position: 'absolute',
+                                        bottom: '7px',
+                                        right: '35px',
+                                        color: '#FB04B4'
+                                    }}
+                                    onClick={handleAddComment}
+                                    disabled={addingComment || comment === null}
+                                >
+                                    Add Comment
+                                </Button>
+                            </CardActions>
+                        </> : <>
+                            <CardContent >
+                                <Typography
+                                    sx={{
+                                        marginLeft: '10px',
+                                        marginRight: '10px',
+                                        fontWeight: 'bold',
+                                        color: '#d32f2f'
+                                    }}
+                                >
+                                    {errorMsg}
+                                </Typography>
+                            </CardContent>
+                        </>
+                }
+
             </Card>
             <Snackbar
                 open={snackOpen}

@@ -9,7 +9,6 @@ import { useParams } from 'react-router-dom';
 
 function PdfViewInvite() {
 
-
     const params = useParams()
     const inviteId = params.inviteId
     const fileId = params.fileId
