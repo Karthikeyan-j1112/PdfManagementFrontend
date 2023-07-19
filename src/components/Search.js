@@ -147,7 +147,7 @@ function Search() {
                 </TableBody>
             </Table>
             {
-                (files.length <= 0 ) ?
+                (files.length > 0 ) ?
                     <Stack width='100%' direction='row' justifyContent='right' alignItems='center'
                         style={{
                             position: 'absolute',
